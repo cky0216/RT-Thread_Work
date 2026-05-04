@@ -50,6 +50,10 @@
 #define MODE_ALL_ON         1
 #define MODE_FLOW           2
 
+static rt_event_t msh_key_event = RT_NULL;
+static rt_event_t key_event     = RT_NULL;
+static rt_event_t led_event     = RT_NULL;
+
 static volatile int Key = 0;
 
 /*
