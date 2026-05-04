@@ -165,6 +165,28 @@ static int key(int argc, char **argv)
 }
 MSH_CMD_EXPORT(key, simulate key input);
 
+/*
+ * 线程1：软件按键线程
+ *
+ * 这个线程接收 msh 命令产生的事件，
+ * 然后转发给模式控制线程。
+ */
+static void soft_key_thread_entry(void *parameter)
+{
+    rt_uint32_t recved;
+
+    while (1)
+    {
+        if (rt_event_recv(key_event,
+                          EVENT_KEY_ALL,
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_FOREVER,
+                          &recved) == RT_EOK)
+        {
+            rt_event_send(key_event, recved);
+        }
+    }
+}
 
 int main(void)
 {
