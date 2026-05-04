@@ -187,6 +187,80 @@ static void soft_key_thread_entry(void *parameter)
         }
     }
 }
+/*
+ * 线程2：模式控制线程
+ *
+ * 只负责判断模式，不直接控制 LED。
+ *
+ * KEY3：
+ * 第一次：LED 全亮
+ * 第二次：进入流水灯模式
+ * 第三次：LED 全灭，然后重新计数
+ *
+ * KEY1：
+ * 流水灯正向 LED1 -> LED2 -> LED3
+ *
+ * KEY2：
+ * 流水灯反向 LED3 -> LED2 -> LED1
+ */
+static void mode_ctrl_thread_entry(void *parameter)
+{
+    rt_uint32_t recved;
+    int current_mode = MODE_OFF;
+
+    while (1)
+    {
+        if (rt_event_recv(key_event,
+                          EVENT_KEY_ALL,
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_FOREVER,
+                          &recved) == RT_EOK)
+        {
+            if (recved & EVENT_KEY3)
+            {
+                if (current_mode == MODE_OFF)
+                {
+                    current_mode = MODE_ALL_ON;
+
+                    rt_kprintf("mode: all LED on\n");
+                    rt_event_send(led_event, LED_EVENT_ALL_ON);
+                }
+                else if (current_mode == MODE_ALL_ON)
+                {
+                    current_mode = MODE_FLOW;
+
+                    rt_kprintf("mode: flow LED\n");
+                    rt_kprintf("input key 1 for LED1 -> LED2 -> LED3\n");
+                    rt_kprintf("input key 2 for LED3 -> LED2 -> LED1\n");
+
+                    rt_event_send(led_event, LED_EVENT_FLOW_IDLE);
+                }
+                else
+                {
+                    current_mode = MODE_OFF;
+
+                    rt_kprintf("mode: all LED off\n");
+                    rt_event_send(led_event, LED_EVENT_ALL_OFF);
+                }
+            }
+
+            if (current_mode == MODE_FLOW)
+            {
+                if (recved & EVENT_KEY1)
+                {
+                    rt_kprintf("flow direction: LED1 -> LED2 -> LED3\n");
+                    rt_event_send(led_event, LED_EVENT_FLOW_FORWARD);
+                }
+
+                if (recved & EVENT_KEY2)
+                {
+                    rt_kprintf("flow direction: LED3 -> LED2 -> LED1\n");
+                    rt_event_send(led_event, LED_EVENT_FLOW_REVERSE);
+                }
+            }
+        }
+    }
+}
 
 int main(void)
 {
