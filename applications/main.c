@@ -50,50 +50,62 @@
 #define MODE_ALL_ON         1
 #define MODE_FLOW           2
 
-static rt_event_t msh_key_event = RT_NULL;
-static rt_event_t key_event     = RT_NULL;
-static rt_event_t led_event     = RT_NULL;
-
-static volatile int Key = 0;
+static rt_event_t key_event = RT_NULL;
+static rt_event_t led_event = RT_NULL;
 
 /*
- * msh 命令：set_mode <value>
- * 例如：
- * msh />set_mode 0
- * msh />set_mode 1
- * msh />set_mode 2
+ * msh 软件按键命令：
+ *
+ * msh />key 1
+ * msh />key 2
+ * msh />key 3
  */
-static int set_mode(int argc, char **argv)
+static int key(int argc, char **argv)
 {
     int value;
 
     if (argc != 2)
     {
-        rt_kprintf("Usage: set_mode <value>\n");
-        rt_kprintf("Example: set_mode 1\n");
+        rt_kprintf("Usage: key <1|2|3>\n");
+        rt_kprintf("Example:\n");
+        rt_kprintf("  key 1\n");
+        rt_kprintf("  key 2\n");
+        rt_kprintf("  key 3\n");
+        return -RT_ERROR;
+    }
+
+    if (key_event == RT_NULL)
+    {
+        rt_kprintf("key_event is not initialized.\n");
         return -RT_ERROR;
     }
 
     value = atoi(argv[1]);
 
-    Key = value;
-
-    rt_kprintf("Key = %d\n", Key);
+    if (value == 1)
+    {
+        rt_event_send(key_event, EVENT_KEY1);
+        rt_kprintf("simulate KEY1 pressed\n");
+    }
+    else if (value == 2)
+    {
+        rt_event_send(key_event, EVENT_KEY2);
+        rt_kprintf("simulate KEY2 pressed\n");
+    }
+    else if (value == 3)
+    {
+        rt_event_send(key_event, EVENT_KEY3);
+        rt_kprintf("simulate KEY3 pressed\n");
+    }
+    else
+    {
+        rt_kprintf("Invalid key value. Please input 1, 2 or 3.\n");
+        return -RT_ERROR;
+    }
 
     return RT_EOK;
 }
-MSH_CMD_EXPORT(set_mode, set mode value);
-
-/*
- * msh 命令：get_mode
- * 用来查看当前变量值
- */
-static int get_mode(int argc, char **argv)
-{
-    rt_kprintf("Key = %d\n", Key);
-    return RT_EOK;
-}
-MSH_CMD_EXPORT(get_mode, get mode value);
+MSH_CMD_EXPORT(key, simulate key input);
 
 
 int main(void)
