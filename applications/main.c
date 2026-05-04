@@ -27,6 +27,29 @@
 #include <finsh.h>
 #include <stdlib.h>
 
+/* 软件按键事件 */
+#define EVENT_KEY1          (1 << 0)
+#define EVENT_KEY2          (1 << 1)
+#define EVENT_KEY3          (1 << 2)
+#define EVENT_KEY_ALL       (EVENT_KEY1 | EVENT_KEY2 | EVENT_KEY3)
+
+/* LED 控制事件 */
+#define LED_EVENT_ALL_OFF       (1 << 0)
+#define LED_EVENT_ALL_ON        (1 << 1)
+#define LED_EVENT_FLOW_IDLE     (1 << 2)
+#define LED_EVENT_FLOW_FORWARD  (1 << 3)
+#define LED_EVENT_FLOW_REVERSE  (1 << 4)
+#define LED_EVENT_ALL       (LED_EVENT_ALL_OFF      | \
+                             LED_EVENT_ALL_ON       | \
+                             LED_EVENT_FLOW_IDLE    | \
+                             LED_EVENT_FLOW_FORWARD | \
+                             LED_EVENT_FLOW_REVERSE)
+
+/* 工作模式 */
+#define MODE_OFF            0
+#define MODE_ALL_ON         1
+#define MODE_FLOW           2
+
 static volatile int Key = 0;
 
 /*
