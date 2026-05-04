@@ -53,6 +53,64 @@
 static rt_event_t key_event = RT_NULL;
 static rt_event_t led_event = RT_NULL;
 
+static int led_state[3] = {0, 0, 0};
+
+static void led_print_state(void)
+{
+    rt_kprintf("LED state: LED1=%s, LED2=%s, LED3=%s\n",
+               led_state[0] ? "ON" : "OFF",
+               led_state[1] ? "ON" : "OFF",
+               led_state[2] ? "ON" : "OFF");
+}
+
+static void led_set(int index, rt_bool_t on)
+{
+    if (index < 0 || index >= 3)
+    {
+        return;
+    }
+
+    led_state[index] = on ? 1 : 0;
+}
+
+static void led_all_on(void)
+{
+    int i;
+
+    for (i = 0; i < 3; i++)
+    {
+        led_set(i, RT_TRUE);
+    }
+
+    led_print_state();
+}
+
+static void led_all_off(void)
+{
+    int i;
+
+    for (i = 0; i < 3; i++)
+    {
+        led_set(i, RT_FALSE);
+    }
+
+    led_print_state();
+}
+
+static void led_show_one(int index)
+{
+    int i;
+
+    for (i = 0; i < 3; i++)
+    {
+        led_set(i, RT_FALSE);
+    }
+
+    led_set(index, RT_TRUE);
+
+    led_print_state();
+}
+
 /*
  * msh Èí¼þ°´¼üÃüÁî£º
  *
