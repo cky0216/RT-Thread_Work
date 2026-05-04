@@ -304,6 +304,20 @@ static void led_display_thread_entry(void *parameter)
                 flow_index = 0;
                 led_all_off();
             }
+            else if (recved & LED_EVENT_FLOW_FORWARD)
+            {
+                flow_dir = 1;
+                flow_index = 0;
+                last_tick = rt_tick_get();
+                led_show_one(flow_index);
+            }
+            else if (recved & LED_EVENT_FLOW_REVERSE)
+            {
+                flow_dir = -1;
+                flow_index = 2;
+                last_tick = rt_tick_get();
+                led_show_one(flow_index);
+            }
         }
     }
 }
