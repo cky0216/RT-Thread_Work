@@ -261,6 +261,52 @@ static void mode_ctrl_thread_entry(void *parameter)
         }
     }
 }
+/*
+ * 线程3：LED 显示线程
+ *
+ * LED 的状态、流水方向、流水位置全部放在这个线程内部。
+ * 其他线程不直接修改这些变量，所以不需要互斥锁。
+ */
+static void led_display_thread_entry(void *parameter)
+{
+    rt_uint32_t recved;
+    int flow_dir = 0;
+    int flow_index = 0;
+    rt_tick_t last_tick = rt_tick_get();
+
+    while (1)
+    {
+        /*
+         * 等待 LED 控制事件。
+         * 这里使用 50ms 超时，是为了让流水灯能够周期性刷新。
+         */
+        if (rt_event_recv led_event,
+                          LED_EVENT_ALL,
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          rt_tick_from_millisecond(50),
+                          &recved) == RT_EOK)
+        {
+            if (recved & LED_EVENT_ALL_OFF)
+            {
+                flow_dir = 0;
+                flow_index = 0;
+                led_all_off();
+            }
+            else if (recved & LED_EVENT_ALL_ON)
+            {
+                flow_dir = 0;
+                flow_index = 0;
+                led_all_on();
+            }
+            else if (recved & LED_EVENT_FLOW_IDLE)
+            {
+                flow_dir = 0;
+                flow_index = 0;
+                led_all_off();
+            }
+        }
+    }
+}
 
 int main(void)
 {
