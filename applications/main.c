@@ -319,8 +319,33 @@ static void led_display_thread_entry(void *parameter)
                 led_show_one(flow_index);
             }
         }
+
+        if (flow_dir != 0)
+        {
+            rt_tick_t now = rt_tick_get();
+
+            if (now - last_tick >= rt_tick_from_millisecond(3000))
+            {
+                last_tick = now;
+
+                flow_index += flow_dir;
+
+                if (flow_index > 2)
+                {
+                    flow_index = 0;
+                }
+                else if (flow_index < 0)
+                {
+                    flow_index = 2;
+                }
+
+                led_show_one(flow_index);
+            }
+        }
     }
 }
+
+
 
 int main(void)
 {
