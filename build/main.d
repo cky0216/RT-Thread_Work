@@ -30,3 +30,8 @@
 .\build\main.o: rt-thread\components\drivers\include\ipc/poll.h
 .\build\main.o: rt-thread\components\drivers\include\drivers/serial.h
 .\build\main.o: rt-thread\components\drivers\include\drivers/pin.h
+.\build\main.o: rt-thread\components\finsh\finsh.h
+.\build\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\build\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\ctype.h
+.\build\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\build\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
